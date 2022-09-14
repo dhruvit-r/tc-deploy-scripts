@@ -28,15 +28,18 @@ track_error()
 }
 download_buildenvfile()
 {
+    echo "Downloading buildenv file from S3"
+    echo "BUILDENV_LIST: $BUILDENV_LIST"
     Buffer_seclist=$(echo $BUILDENV_LIST | sed 's/,/ /g' )
     for listname in $Buffer_seclist;
     do
-        aws s3 cp s3://tc-platform-${ENV_CONFIG}/securitymanager/$listname.json .
+        aws s3 cp s3://dr-platform-${ENV_CONFIG}/securitymanager/$listname.json .
         track_error $? "Environment setting"
     done
 }
 uploading_buildenvvar()
 {
+    echo "Uploading buildenv file to S3"
     Buffer_seclist=$(echo $BUILDENV_LIST | sed 's/,/ /g')
     for listname in $Buffer_seclist;
     do
@@ -58,6 +61,7 @@ uploading_buildenvvar()
 }
 
 configure_aws_cli() {
+    echo "Configuring AWS CLI"
 	aws --version
 	aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
 	aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
@@ -89,7 +93,7 @@ done
 # AWS_REGION=$(eval "echo \$${ENV}_AWS_REGION")
 # if [ -z $AWS_REGION ];
 # then
-# AWS_REGION="us-east-1"
+# AWS_REGION="us-east-2"
 # fi
 # if [ -z $AWS_ACCESS_KEY_ID ] || [ -z $AWS_SECRET_ACCESS_KEY ] ;
 # then

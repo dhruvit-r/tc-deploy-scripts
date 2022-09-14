@@ -122,7 +122,7 @@ configure_aws_cli() {
 }
 #Function for private dcoker login
 configure_docker_private_login() {
-	aws s3 cp "s3://appirio-platform-$ENV_CONFIG/services/common/dockercfg" ~/.dockercfg
+	aws s3 cp "s3://dr-platform-$ENV_CONFIG/services/common/dockercfg" ~/.dockercfg
 }
 
 #ECS Deployment Functions
@@ -137,6 +137,7 @@ ECS_push_ecr_image() {
         ECS_TAG=$CIRCLE_BUILD_NUM
     fi
 	log "Pushing Docker Image..."
+    echo $(aws ecr get-login --region $AWS_REGION --no-include-email)
 	eval $(aws ecr get-login --region $AWS_REGION --no-include-email)
 	docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_REPOSITORY:$ECS_TAG
 	track_error $? "ECS ECR image push"
@@ -584,7 +585,7 @@ download_envfile()
     Buffer_seclist=$(echo $SEC_LIST | sed 's/,/ /g' )
     for listname in $Buffer_seclist;
     do
-        aws s3 cp s3://tc-platform-${ENV_CONFIG}/securitymanager/$listname.json .
+        aws s3 cp s3://dr-platform-${ENV_CONFIG}/securitymanager/$listname.json .
         #cp $HOME/buildscript/securitymanager/$listname.json.enc .
         #SECPASSWD=$(eval "echo \$${listname}")
         #openssl enc -aes-256-cbc -d -md MD5 -in $listname.json.enc -out $listname.json -k $SECPASSWD
@@ -918,7 +919,7 @@ then
         #env file updation
         ECSCLI_update_env
         # Configurong cluster
-        ecs-cli configure --region us-east-1 --cluster $AWS_ECS_CLUSTER
+        ecs-cli configure --region us-east-2 --cluster $AWS_ECS_CLUSTER
         # updating service
         echo "value of AWS_ECS_SERVICE " $AWS_ECS_SERVICE
         AWS_ECS_SERVICE_NAMES=$(echo ${AWS_ECS_SERVICE} | sed 's/,/ /g')
